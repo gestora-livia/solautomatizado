@@ -1,0 +1,1305 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Método S.O.L. | Sistema Operacional de Lançamentos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #947653;
+            --dark-gold: #5b3b03;
+            --light-cream: #ffe1a1;
+            --cream-bg: #fcfaf7;
+            --white: #ffffff;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--white);
+            color: #2b2b2b;
+            overflow-x: hidden;
+            margin: 0;
+            padding: 0;
+        }
+        
+        /* Ajuste para o menu flutuante não tampar os títulos ao clicar e scroll suave */
+        html {
+            scroll-padding-top: 6rem;
+            scroll-behavior: smooth;
+        }
+
+        h1, h2, h3, .font-serif, .font-serif-italic {
+            font-family: 'Playfair Display', serif;
+        }
+        
+        /* Utilitários de Cor Personalizados */
+        .bg-gold { background-color: var(--gold); }
+        .text-gold { color: var(--gold); }
+        .border-gold { border-color: var(--gold); }
+        .bg-dark-gold { background-color: var(--dark-gold); }
+        .text-dark-gold { color: var(--dark-gold); }
+        .bg-cream { background-color: var(--light-cream); }
+        .text-cream { color: var(--light-cream); }
+        .bg-cream-light { background-color: var(--cream-bg); }
+
+        /* Botão High Ticket */
+        .btn-cta {
+            background-color: var(--dark-gold);
+            color: var(--white);
+            padding: 1.15rem 2.5rem;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 1.125rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            box-shadow: 0 10px 25px -5px rgba(91, 59, 3, 0.3);
+            border: 1px solid var(--dark-gold);
+            text-transform: uppercase;
+        }
+        .btn-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 35px -5px rgba(91, 59, 3, 0.4);
+            background-color: var(--white);
+            color: var(--dark-gold);
+            border-color: var(--dark-gold);
+        }
+
+        /* Inputs do Formulário */
+        .form-input {
+            width: 100%;
+            background-color: #1a1a1a;
+            border: 1px solid rgba(148, 118, 83, 0.3);
+            color: white;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.95rem;
+            transition: border-color 0.3s;
+        }
+        .form-input:focus {
+            outline: none;
+            border-color: var(--gold);
+            box-shadow: 0 0 0 1px rgba(148, 118, 83, 0.5);
+        }
+        .form-label {
+            display: block;
+            color: #d1d5db;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        .form-radio-checkbox {
+            accent-color: var(--gold);
+            width: 1rem;
+            height: 1rem;
+            background-color: #1a1a1a;
+            border: 1px solid rgba(148, 118, 83, 0.5);
+            cursor: pointer;
+        }
+
+        /* Animação Marquee */
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        .marquee-container {
+            overflow: hidden;
+            white-space: nowrap;
+            display: flex;
+            background-color: var(--dark-gold);
+            border-top: 1px solid rgba(148, 118, 83, 0.3);
+            border-bottom: 1px solid rgba(148, 118, 83, 0.3);
+        }
+        .marquee-content {
+            display: flex;
+            animation: marquee 30s linear infinite;
+            min-width: 200%;
+        }
+        .marquee-item {
+            display: flex;
+            align-items: center;
+            gap: 4rem;
+            padding: 0.75rem 4rem;
+        }
+
+        /* Detalhes do Accordion (FAQ) */
+        details > summary { list-style: none; }
+        details > summary::-webkit-details-marker { display: none; }
+        
+        /* Node Animation */
+        .pulse-dot {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: .5; transform: scale(1.1); }
+        }
+        .flow-line {
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+            background-size: 200% 100%;
+            animation: flow 2s linear infinite;
+        }
+        @keyframes flow {
+            0% { background-position: 100% 0; }
+            100% { background-position: -100% 0; }
+        }
+
+        /* Utilitário para ocultar barra de rolagem */
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Slider S.O.L. (Vertical no Mobile) */
+        .slider-container {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            padding-bottom: 1rem;
+            scroll-behavior: smooth;
+        }
+        .slider-card {
+            width: 100%;
+        }
+        @media (min-width: 768px) {
+            .slider-container {
+                flex-direction: row;
+                overflow-x: auto;
+                scroll-snap-type: x mandatory;
+                gap: 1.5rem;
+                padding-bottom: 2rem;
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+            }
+            .slider-card {
+                scroll-snap-align: center;
+                flex: 0 0 70%;
+                max-width: 800px;
+            }
+        }
+        
+        /* Classes Menu Mobile */
+        .mobile-drawer-open {
+            transform: translateX(0) !important;
+        }
+        .overlay-open {
+            display: block !important;
+            opacity: 1 !important;
+        }
+        
+        /* Loading Spinner */
+        .loader {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 3px solid white;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: none;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-gold selection:text-white">
+
+    <!-- MENU DESKTOP -->
+    <div class="hidden md:block fixed top-6 left-1/2 -translate-x-1/2 z-50 w-auto bg-[#0a0a0a]/90 backdrop-blur-lg border border-white/10 rounded-full shadow-[0_15px_35px_rgba(0,0,0,0.5)]">
+        <nav class="w-full rounded-full">
+            <ul class="flex items-center gap-4 text-sm font-medium text-gray-300 px-6 py-3 mx-auto">
+                <li><a href="#inicio" class="block px-4 py-2 hover:text-cream hover:bg-white/5 rounded-full transition-all whitespace-nowrap">Início</a></li>
+                <li><a href="#resultados" class="block px-4 py-2 hover:text-cream hover:bg-white/5 rounded-full transition-all whitespace-nowrap">Resultados</a></li>
+                <li><a href="#o-metodo" class="block px-4 py-2 hover:text-cream hover:bg-white/5 rounded-full transition-all whitespace-nowrap">O Método</a></li>
+                <li><a href="#clientes" class="block px-4 py-2 hover:text-cream hover:bg-white/5 rounded-full transition-all whitespace-nowrap text-gold font-semibold">Clientes</a></li>
+                <li><a href="#como-funciona" class="block px-4 py-2 hover:text-cream hover:bg-white/5 rounded-full transition-all whitespace-nowrap">Como Funciona</a></li>
+                <li><a href="#quem-sou" class="block px-4 py-2 hover:text-cream hover:bg-white/5 rounded-full transition-all whitespace-nowrap">Quem Sou</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <!-- BOTÃO MENU MOBILE (Hambúrguer) -->
+    <button id="mobileMenuBtn" class="md:hidden fixed top-4 right-4 z-[60] w-12 h-12 bg-[#0a0a0a]/90 backdrop-blur-lg border border-white/10 rounded-full flex items-center justify-center text-gold shadow-[0_5px_15px_rgba(0,0,0,0.5)]">
+        <svg id="icon-open" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+        <svg id="icon-close" class="hidden" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+    </button>
+
+    <!-- OVERLAY ESCURO MOBILE -->
+    <div id="mobileOverlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 hidden opacity-0 transition-opacity duration-300"></div>
+
+    <!-- GAVETA (DRAWER) MENU MOBILE -->
+    <div id="mobileDrawer" class="fixed top-0 right-0 h-full w-[280px] bg-[#0f0f0f] border-l border-white/10 z-50 transform translate-x-full transition-transform duration-300 flex flex-col pt-24 px-6 shadow-2xl">
+        <div class="text-gold font-serif italic text-2xl mb-8 border-b border-white/10 pb-4">S.O.L.</div>
+        <ul class="flex flex-col gap-2 text-lg font-medium text-gray-300">
+            <li><a href="#inicio" class="mobile-link block px-4 py-3 hover:text-cream hover:bg-white/5 rounded-lg transition-all">Início</a></li>
+            <li><a href="#resultados" class="mobile-link block px-4 py-3 hover:text-cream hover:bg-white/5 rounded-lg transition-all">Resultados</a></li>
+            <li><a href="#o-metodo" class="mobile-link block px-4 py-3 hover:text-cream hover:bg-white/5 rounded-lg transition-all">O Método</a></li>
+            <li><a href="#clientes" class="mobile-link block px-4 py-3 hover:text-cream hover:bg-white/5 rounded-lg transition-all text-gold font-semibold">Clientes</a></li>
+            <li><a href="#como-funciona" class="mobile-link block px-4 py-3 hover:text-cream hover:bg-white/5 rounded-lg transition-all">Como Funciona</a></li>
+            <li><a href="#quem-sou" class="mobile-link block px-4 py-3 hover:text-cream hover:bg-white/5 rounded-lg transition-all">Quem Sou</a></li>
+        </ul>
+    </div>
+
+    <!-- DOBRA 1 | HERO -->
+    <section id="inicio" class="relative bg-white pb-8 md:pb-16 flex flex-col items-center overflow-hidden">
+        
+        <!-- ANIMAÇÃO MOTOR OPERACIONAL NO TOPO -->
+        <div class="w-full bg-[#1c1c1c] border-b border-gold/20 pt-16 pb-8 md:pt-28 md:pb-16 relative overflow-hidden flex flex-col items-center justify-center z-10">
+            
+            <p class="text-center text-[9px] md:text-xs text-white uppercase tracking-[0.2em] font-bold mb-4 md:mb-5 relative z-40 drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]">Visão da Engenharia S.O.L.</p>
+            
+            <div class="flex flex-row items-center justify-center gap-1 sm:gap-2 md:gap-4 relative z-40 w-full max-w-5xl mx-auto px-1 hide-scrollbar">
+                
+                <div class="bg-[#222222] border border-[#333] rounded-lg md:rounded-xl p-2 md:p-5 w-[85px] sm:w-[110px] md:w-48 flex-shrink-0 text-center shadow-lg relative flex flex-col items-center">
+                    <div class="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 rounded-full bg-green-900/30 text-green-400 flex items-center justify-center mb-1 md:mb-4 pulse-dot drop-shadow-[0_0_10px_rgba(74,222,128,0.4)]">
+                        <svg class="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                    </div>
+                    <p class="text-white text-[8.5px] sm:text-[10px] md:text-sm font-bold leading-tight drop-shadow-md">Pitch de Vendas</p>
+                    <p class="text-gray-100 text-[7px] sm:text-[8px] md:text-xs mt-1">Gatilho de Ação</p>
+                </div>
+
+                <div class="w-3 sm:w-5 md:w-10 h-[2px] md:h-1 flex-shrink-0 flow-line rounded"></div>
+
+                <div class="bg-[#222222] border border-gold rounded-lg md:rounded-xl p-2 md:p-5 w-[100px] sm:w-[115px] md:w-52 flex-shrink-0 text-center shadow-xl transform md:-translate-y-3 relative overflow-hidden">
+                    <div class="absolute inset-0 bg-gold/10"></div>
+                    <div class="flex items-center justify-center mx-auto mb-1 md:mb-4 text-cream relative z-10 drop-shadow-[0_0_8px_rgba(255,225,161,0.6)]">
+                        <svg class="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 animate-[spin_4s_linear_infinite]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                    </div>
+                    <p class="text-cream text-[9.5px] sm:text-[11px] md:text-sm font-bold leading-tight relative z-10 drop-shadow-md">Engenharia S.O.L.</p>
+                    <p class="text-white text-[7px] sm:text-[8px] md:text-xs mt-1 relative z-10 drop-shadow-sm">Calculando prazos...</p>
+                </div>
+
+                <div class="w-3 sm:w-5 md:w-10 h-[2px] md:h-1 flex-shrink-0 flow-line rounded"></div>
+
+                <div class="bg-[#222222] border border-[#333] rounded-lg md:rounded-xl p-2 md:p-5 w-[85px] sm:w-[110px] md:w-48 flex-shrink-0 text-center shadow-lg flex flex-col items-center">
+                    <div class="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 rounded-full bg-blue-900/30 text-blue-400 flex items-center justify-center mb-1 md:mb-4 pulse-dot drop-shadow-[0_0_10px_rgba(96,165,250,0.4)]" style="animation-delay: 1s;">
+                        <svg class="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                    </div>
+                    <p class="text-white text-[8.5px] sm:text-[10px] md:text-sm font-bold leading-tight drop-shadow-md">Reunião Inicial</p>
+                    <p class="text-gray-100 text-[7px] sm:text-[8px] md:text-xs mt-1">Agendada</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="container mx-auto max-w-5xl px-4 relative z-30 text-center flex flex-col items-center">
+            
+            <h1 class="text-[1.45rem] sm:text-[1.65rem] md:text-5xl lg:text-6xl leading-[1.2] md:leading-[1.1] mt-6 md:mt-16 mb-3 md:mb-8 text-gray-900 font-serif max-w-4xl tracking-tight">
+                Pare de rodar lançamento sempre como se fosse a primeira vez. <br class="hidden md:block">
+                <span class="italic text-dark-gold font-medium border-b-4 border-gold/30">Automatize sua operação.</span>
+            </h1>
+            
+            <p class="text-[0.85rem] sm:text-[0.95rem] md:text-2xl text-gray-700 mb-5 md:mb-12 leading-relaxed max-w-4xl font-light">
+                Descubra como coprodutores e agências estão faturando alto com uma <strong class="font-semibold text-dark-gold">Engenharia Operacional feita sob medida</strong>, que distribui tarefas, cobra prazos com cronograma reverso e aprova materiais de forma 100% automática sem depender de humanos.
+            </p>
+
+            <div class="w-full sm:w-auto flex flex-col items-center gap-2 md:gap-4">
+                <button type="button" onclick="openFormModal()" class="btn-cta text-[0.9rem] sm:text-[1rem] md:text-xl px-4 sm:px-6 md:px-16 py-3 md:py-5 w-full sm:w-auto shadow-2xl hover:scale-105 transition-transform duration-300 rounded-lg uppercase">
+                    Quero automatizar minha operação
+                </button>
+                <span class="text-[7.5px] sm:text-[8.5px] md:text-xs text-gray-400 font-bold uppercase tracking-widest flex items-center justify-center gap-1.5 mt-1 text-center">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-gold flex-shrink-0 md:w-3.5 md:h-3.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    AGENDE SEU DIAGNÓSTICO · 30 MINUTOS · SEM COMPROMISSO
+                </span>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAIXA DE AUTORIDADE -->
+    <div class="w-full bg-white border-y border-gray-100 py-8 md:py-4 relative z-20 shadow-sm">
+        <div class="container mx-auto px-4 max-w-5xl">
+            <div class="flex flex-col md:flex-row justify-center items-center gap-6 md:gap-16">
+                
+                <div class="flex flex-col md:flex-row items-center gap-2 md:gap-3 text-center md:text-left">
+                    <span class="text-4xl md:text-4xl font-black text-[#5b3b03] font-serif">+150</span>
+                    <span class="text-[10px] font-bold text-gray-500 uppercase tracking-[0.15em] leading-tight">Lançamentos<br class="hidden md:block">Estruturados</span>
+                </div>
+                
+                <div class="hidden md:block w-px h-8 bg-gray-200"></div>
+                <div class="block md:hidden w-16 h-px bg-gray-200"></div>
+                
+                <div class="flex flex-col md:flex-row items-center gap-2 md:gap-3 text-center md:text-left">
+                    <span class="text-4xl md:text-4xl font-black text-[#5b3b03] font-serif">+7</span>
+                    <span class="text-[10px] font-bold text-gray-500 uppercase tracking-[0.15em] leading-tight">Anos Como Gestora<br class="hidden md:block">de Projetos</span>
+                </div>
+
+                <div class="hidden md:block w-px h-8 bg-gray-200"></div>
+                <div class="block md:hidden w-16 h-px bg-gray-200"></div>
+
+                <div class="flex flex-col md:flex-row items-center gap-2 md:gap-3 text-center md:text-left">
+                    <div class="text-[#5b3b03] flex items-center justify-center">
+                        <svg class="w-10 h-10 md:w-10 md:h-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M4 14l8-8 8 8" />
+                        </svg>
+                    </div>
+                    <span class="text-[10px] font-bold text-gray-500 uppercase tracking-[0.15em] leading-tight">ClickUp<br class="hidden md:block">Power User</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- DOBRA 2 | A PROVA SOCIAL IMEDIATA (Resultados com Logos) -->
+    <section id="resultados" class="bg-dark-gold py-16 md:py-24 px-6 text-center border-b border-gold/30">
+        <div class="container mx-auto max-w-6xl">
+            <h2 class="text-2xl md:text-3xl lg:text-4xl text-cream mb-16 font-serif max-w-3xl mx-auto leading-relaxed">
+                Desde 2018 construindo os bastidores que sustentam lançamentos de <span class="italic text-white">7 dígitos.</span>
+            </h2>
+            
+            <div class="grid md:grid-cols-2 gap-8 text-left">
+                <!-- Case 1 -->
+                <div class="bg-white/5 border border-gold/20 p-8 md:p-10 rounded-xl backdrop-blur-sm relative overflow-hidden group hover:bg-white/10 transition-colors">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-gold/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+                    
+                    <div class="flex justify-between items-center mb-6 pb-6 border-b border-white/10">
+                        <div class="flex flex-col">
+                            <span class="text-cream font-bold uppercase tracking-widest text-xs mb-2 opacity-90">Case Simultaneidade</span>
+                            <p class="text-4xl md:text-5xl font-serif text-white">R$ 3 Milhões</p>
+                        </div>
+                        
+                        <!-- Círculo para Logo maior. 
+                             MUDANÇA AQUI: Removi p-2 e object-contain. 
+                             Adicionado object-cover na imagem para ela adaptar-se ao contêiner quadrado e o rounded-full cortar perfeitamente. -->
+                        <div class="w-20 h-20 md:w-28 md:h-28 rounded-full bg-[#111111] border border-gold/30 flex-shrink-0 flex items-center justify-center overflow-hidden ml-4">
+                            <img src="logo_agencia.jpg" alt="Logo Parceiro" class="w-full h-full object-cover" onerror="this.src='https://ui-avatars.com/api/?name=Agencia+A&background=111&color=947653'">
+                        </div>
+                    </div>
+
+                    <p class="text-base md:text-lg text-gray-200 leading-relaxed font-light italic">
+                        "Rodamos 4 lançamentos em paralelo sem contratar ninguém novo. A passagem de bastão que antes dependia de mim agora é automática. O sistema sustentou a operação inteira."
+                    </p>
+                    <p class="mt-4 text-sm text-cream opacity-80 font-medium">— Agência Parceira</p>
+                </div>
+                
+                <!-- Case 2 -->
+                <div class="bg-white/5 border border-gold/20 p-8 md:p-10 rounded-xl backdrop-blur-sm relative overflow-hidden group hover:bg-white/10 transition-colors">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-gold/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+                    
+                    <div class="flex justify-between items-center mb-6 pb-6 border-b border-white/10">
+                        <div class="flex flex-col">
+                            <span class="text-cream font-bold uppercase tracking-widest text-xs mb-2 opacity-90">Case MasterNova</span>
+                            <p class="text-4xl md:text-5xl font-serif text-white">R$ 280 Mil</p>
+                        </div>
+                        
+                        <!-- Círculo para Logo maior. MUDANÇA AQUI TAMBÉM (object-cover) -->
+                        <div class="w-20 h-20 md:w-28 md:h-28 rounded-full bg-[#111111] border border-gold/30 flex-shrink-0 flex items-center justify-center overflow-hidden ml-4">
+                            <img src="logo_masternova.jpg" alt="Logo Parceiro" class="w-full h-full object-cover" onerror="this.src='https://ui-avatars.com/api/?name=Master+Nova&background=111&color=947653'">
+                        </div>
+                    </div>
+
+                    <p class="text-base md:text-lg text-gray-200 leading-relaxed font-light italic">
+                        "Foram 6 lançamentos pagos em 7 semanas, com equipe enxuta. Antes eu aprovava tudo no WhatsApp às 23h. Hoje o lançamento roda e eu só entro quando preciso pensar na estratégia."
+                    </p>
+                    <p class="mt-4 text-sm text-cream opacity-80 font-medium">— Só com ingressos</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- DOBRA 3 | O QUE É O S.O.L.? -->
+    <section id="o-metodo" class="bg-[#111111] py-24 md:py-32 px-6 relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-gold/20 to-transparent"></div>
+        <div class="absolute bottom-0 right-0 w-[500px] h-[500px] bg-gold/5 rounded-full blur-[120px] pointer-events-none"></div>
+        
+        <div class="container mx-auto max-w-6xl relative z-10">
+            <div class="text-center mb-20">
+                <span class="inline-block px-5 py-2 rounded-full bg-white/5 border border-white/10 text-cream text-[10px] md:text-xs font-bold mb-6 tracking-[0.2em] uppercase backdrop-blur-sm shadow-lg">
+                    O S.O.L. (Sistema Operacional de Lançamentos)
+                </span>
+                <h2 class="text-3xl md:text-5xl lg:text-6xl text-white font-serif tracking-tight drop-shadow-[0_0_15px_rgba(255,255,255,0.2)] mb-6">
+                    Não é um simples template.<br>
+                    <span class="italic text-cream drop-shadow-[0_0_15px_rgba(255,225,161,0.4)]">É um motor vivo.</span>
+                </h2>
+                <p class="text-lg md:text-xl text-gray-300 font-light max-w-3xl mx-auto leading-relaxed">
+                    Uma engenharia cirúrgica feita sob medida que integra perfeitamente
+                    <span class="block mt-4">
+                        <strong class="text-white font-medium border-b border-gold/40 pb-1 text-xl md:text-2xl">ClickUp + Make + Inteligência Artificial.</strong>
+                    </span>
+                </p>
+
+                <!-- Box com as Logos Menores -->
+                <div class="flex flex-wrap items-center justify-center gap-3 md:gap-5 mt-8">
+                    <!-- ClickUp -->
+                    <div class="bg-white/5 px-4 py-2.5 rounded-xl border border-white/10 flex items-center gap-2 backdrop-blur-sm shadow-lg">
+                        <img src="icone_clickup.png" alt="ClickUp Icon" class="h-5 md:h-6 w-auto object-contain">
+                        <span class="text-white text-sm md:text-base font-semibold tracking-wide">ClickUp</span>
+                    </div>
+                    
+                    <span class="text-gold font-bold text-xl opacity-60">+</span>
+                    
+                    <!-- Make -->
+                    <div class="bg-white/5 px-4 py-2.5 rounded-xl border border-white/10 flex items-center gap-2 backdrop-blur-sm shadow-lg">
+                        <img src="icone_make.png" alt="Make Icon" class="w-5 h-5 md:w-6 md:h-6 object-contain rounded-full shadow-inner">
+                        <span class="text-white text-sm md:text-base font-semibold tracking-wide">Make</span>
+                    </div>
+
+                    <span class="text-gold font-bold text-xl opacity-60">+</span>
+                    
+                    <!-- IA -->
+                    <div class="bg-white/5 px-4 py-2.5 rounded-xl border border-white/10 flex items-center gap-2 backdrop-blur-sm shadow-lg">
+                        <div class="text-blue-400 flex items-center justify-center">
+                            <svg class="w-5 h-5 md:w-6 md:h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+                        </div>
+                        <span class="text-white text-sm md:text-base font-semibold tracking-wide">I.A.</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-16">
+                <h3 class="text-2xl md:text-3xl text-white font-serif mb-10 border-l-2 border-[#e8c385] pl-4 drop-shadow-md">Os 3 Pilares da Engenharia S.O.L.</h3>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="bg-[#161616] border border-[#2a2a2a] p-8 md:p-10 rounded-xl hover:border-[#e8c385]/40 transition-colors shadow-[0_10px_30px_rgba(0,0,0,0.5)] group">
+                        <svg class="w-7 h-7 text-[#e8c385] mb-6 group-hover:scale-110 transition-transform" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                        <h4 class="text-xl font-bold text-cream mb-4 font-serif">1. Automação Ativa</h4>
+                        <p class="text-white leading-relaxed font-light text-sm md:text-base">Passagem de bastão 100% automatizada. Assim que a copy é finalizada, o designer responsável recebe os briefings e alertas na hora, sem reuniões.</p>
+                    </div>
+
+                    <div class="bg-[#161616] border border-[#2a2a2a] p-8 md:p-10 rounded-xl hover:border-[#e8c385]/40 transition-colors shadow-[0_10px_30px_rgba(0,0,0,0.5)] group">
+                        <svg class="w-7 h-7 text-[#e8c385] mb-6 group-hover:scale-110 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path></svg>
+                        <h4 class="text-xl font-bold text-cream mb-4 font-serif">2. Inteligência Visual</h4>
+                        <p class="text-white leading-relaxed font-light text-sm md:text-base">Dashboards dinâmicos de alto padrão que apontam com precisão milimétrica onde está o gargalo operacional antes que ele vire uma crise.</p>
+                    </div>
+
+                    <div class="bg-[#161616] border border-[#2a2a2a] p-8 md:p-10 rounded-xl hover:border-[#e8c385]/40 transition-colors shadow-[0_10px_30px_rgba(0,0,0,0.5)] group">
+                        <svg class="w-7 h-7 text-[#e8c385] mb-6 group-hover:scale-110 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                        <h4 class="text-xl font-bold text-cream mb-4 font-serif">3. Arquitetura Anti-Caos</h4>
+                        <p class="text-white leading-relaxed font-light text-sm md:text-base">Elimina completamente a dependência da sua memória centralizada. O conhecimento e os processos passam a morar definitivamente no motor vivo.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-16">
+                <h3 class="text-2xl md:text-3xl text-white font-serif mb-10 border-l-2 border-[#e8c385] pl-4 drop-shadow-md">Exclusividades que você nunca viu em nenhum template</h3>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="bg-[#161616] border border-[#2a2a2a] p-8 md:p-10 rounded-xl hover:border-[#e8c385]/40 transition-colors shadow-[0_10px_30px_rgba(0,0,0,0.5)] group">
+                        <h4 class="text-lg font-bold text-[#e8c385] mb-4 font-serif">Cronograma Reverso Inteligente</h4>
+                        <p class="text-white leading-relaxed font-light text-sm md:text-base">Todos os prazos operacionais são calculados de trás para frente de forma automática com base na data de captação do lead, incluindo margens e travas de segurança robustas.</p>
+                    </div>
+
+                    <div class="bg-[#161616] border border-[#2a2a2a] p-8 md:p-10 rounded-xl hover:border-[#e8c385]/40 transition-colors shadow-[0_10px_30px_rgba(0,0,0,0.5)] group">
+                        <h4 class="text-lg font-bold text-[#e8c385] mb-4 font-serif">Portal do Especialista Clean</h4>
+                        <p class="text-white leading-relaxed font-light text-sm md:text-base">Um ecossistema visual exclusivo e limpo onde o expert aprova criativos, páginas e e-mails com apenas um clique, totalmente blindado do "bate-boca" e ruído do time interno.</p>
+                    </div>
+
+                    <div class="bg-[#161616] border border-[#2a2a2a] p-8 md:p-10 rounded-xl hover:border-[#e8c385]/40 transition-colors shadow-[0_10px_30px_rgba(0,0,0,0.5)] group">
+                        <h4 class="text-lg font-bold text-[#e8c385] mb-4 font-serif">IA Nativa de Briefings</h4>
+                        <p class="text-white leading-relaxed font-light text-sm md:text-base">Briefings brutos que são processados por prompts proprietários estruturados, gerando Blueprints automáticos de tarefas detalhadas sem intervenção manual de gestores.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mt-6">
+                <!-- Botão alterado para abrir o Modal -->
+                <button type="button" onclick="openFormModal()" class="btn-cta text-lg px-10 py-4 w-full sm:w-auto shadow-2xl hover:scale-105 transition-transform duration-300 rounded-lg uppercase inline-flex items-center gap-3">
+                    Quero essa engenharia no meu negócio
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </button>
+            </div>
+            
+        </div>
+    </section>
+
+    <!-- DOBRA 3.5 | SLIDER DE VÍDEOS -->
+    <section class="py-24 bg-[#0a0a0a] border-y border-white/10">
+        <div class="container mx-auto px-6 max-w-6xl">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-5xl text-white font-serif mb-4 drop-shadow-md">O S.O.L. <span class="italic text-cream">por dentro</span></h2>
+                <p class="text-lg text-gray-300">Veja a estrutura operando na prática.</p>
+            </div>
+            
+            <div class="relative group">
+                <!-- Z-index alterado para 30 nas setas para sobreporem os vídeos e ficarem clicáveis -->
+                <button onclick="slideSlider(-1)" class="hidden md:flex absolute left-2 md:-left-6 top-1/2 -translate-y-1/2 z-30 w-10 h-10 md:w-12 md:h-12 bg-[#1a1a1a] border border-gold/40 rounded-full items-center justify-center text-gold hover:bg-gold hover:text-dark-gold transition-all shadow-[0_0_20px_rgba(0,0,0,0.8)] cursor-pointer backdrop-blur-sm opacity-90 hover:opacity-100">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+                </button>
+                
+                <button onclick="slideSlider(1)" class="hidden md:flex absolute right-2 md:-right-6 top-1/2 -translate-y-1/2 z-30 w-10 h-10 md:w-12 md:h-12 bg-[#1a1a1a] border border-gold/40 rounded-full items-center justify-center text-gold hover:bg-gold hover:text-dark-gold transition-all shadow-[0_0_20px_rgba(0,0,0,0.8)] cursor-pointer backdrop-blur-sm opacity-90 hover:opacity-100">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+                </button>
+
+                <!-- Adicionado relative z-10 para ficar atrás das setas -->
+                <div id="sol-slider" class="slider-container relative z-10">
+                    
+                    <div class="slider-card bg-[#1c1c1c] border border-gold/30 rounded-2xl overflow-hidden aspect-video relative group cursor-grab">
+                        <video src="dashboard.mp4" class="w-full h-full object-cover relative z-10" autoplay loop muted playsinline></video>
+                    </div>
+
+                    <div class="slider-card bg-[#1c1c1c] border border-gold/30 rounded-2xl overflow-hidden aspect-video relative group cursor-grab">
+                        <video src="tarefas.mp4" class="w-full h-full object-cover relative z-10" autoplay loop muted playsinline></video>
+                    </div>
+
+                    <div class="slider-card bg-[#1c1c1c] border border-gold/30 rounded-2xl overflow-hidden aspect-video relative group cursor-grab">
+                        <video src="cronograma.mp4" class="w-full h-full object-cover relative z-10" autoplay loop muted playsinline></video>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- DOBRA 3.75 | CLIENTES / QUEM CONFIA -->
+    <section id="clientes" class="py-24 md:py-32 px-6 bg-[#111111] border-b border-white/5 relative overflow-hidden">
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-gold/5 blur-[120px] rounded-full pointer-events-none"></div>
+        
+        <div class="container mx-auto max-w-6xl relative z-10">
+            <div class="text-center mb-16 md:mb-24">
+                <span class="text-gold font-bold uppercase tracking-widest text-xs mb-4 block">Eles já vivem essa realidade</span>
+                <h2 class="text-3xl md:text-5xl text-white font-serif mb-6 drop-shadow-md">
+                    Quem já confiou sua <span class="italic text-cream">operação a nós</span>
+                </h2>
+                <p class="text-base md:text-lg text-gray-400 max-w-3xl mx-auto font-light leading-relaxed">
+                    Mais de 100 lançamentos gerenciados, organizando processos, equipes, cronogramas e entregas para especialistas de diferentes nichos.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8">
+                
+                <!-- Bruno -->
+                <div class="group flex flex-col items-center text-center">
+                    <div class="w-32 h-32 md:w-40 md:h-40 rounded-full bg-[#1c1c1c] border-2 border-gold/20 p-1.5 mb-6 relative overflow-hidden group-hover:border-gold transition-all duration-500 shadow-[0_0_20px_rgba(148,118,83,0.05)] group-hover:shadow-[0_0_30px_rgba(148,118,83,0.2)] group-hover:-translate-y-2">
+                        <div class="w-full h-full rounded-full overflow-hidden bg-gray-900 relative">
+                             <img src="bruno.jpg" alt="Bruno Guimarães" class="w-full h-full object-cover relative z-10" onerror="this.src='https://ui-avatars.com/api/?name=Bruno&background=111&color=947653'">
+                        </div>
+                    </div>
+                    <h3 class="text-xl md:text-2xl text-cream font-serif font-bold mb-3">Bruno Guimarães</h3>
+                    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-gray-300 text-xs md:text-sm shadow-inner">
+                        <span class="w-1.5 h-1.5 rounded-full bg-gold animate-pulse"></span>
+                        +30 lançamentos
+                    </div>
+                </div>
+
+                <!-- Carol -->
+                <div class="group flex flex-col items-center text-center">
+                    <div class="w-32 h-32 md:w-40 md:h-40 rounded-full bg-[#1c1c1c] border-2 border-gold/20 p-1.5 mb-6 relative overflow-hidden group-hover:border-gold transition-all duration-500 shadow-[0_0_20px_rgba(148,118,83,0.05)] group-hover:shadow-[0_0_30px_rgba(148,118,83,0.2)] group-hover:-translate-y-2">
+                        <div class="w-full h-full rounded-full overflow-hidden bg-gray-900 relative">
+                             <img src="carol.jpg" alt="Carol Bucci" class="w-full h-full object-cover relative z-10" onerror="this.src='https://ui-avatars.com/api/?name=Carol&background=111&color=947653'">
+                        </div>
+                    </div>
+                    <h3 class="text-xl md:text-2xl text-cream font-serif font-bold mb-3">Carol Bucci</h3>
+                    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-gray-300 text-xs md:text-sm shadow-inner">
+                        <span class="w-1.5 h-1.5 rounded-full bg-gold animate-pulse"></span>
+                        +27 lançamentos
+                    </div>
+                </div>
+
+                <!-- Speech -->
+                <div class="group flex flex-col items-center text-center">
+                    <div class="w-32 h-32 md:w-40 md:h-40 rounded-full bg-[#1c1c1c] border-2 border-gold/20 p-1.5 mb-6 relative overflow-hidden group-hover:border-gold transition-all duration-500 shadow-[0_0_20px_rgba(148,118,83,0.05)] group-hover:shadow-[0_0_30px_rgba(148,118,83,0.2)] group-hover:-translate-y-2">
+                        <div class="w-full h-full rounded-full overflow-hidden bg-gray-900 relative">
+                             <img src="speech.jpg" alt="Speech Fono" class="w-full h-full object-cover relative z-10" onerror="this.src='https://ui-avatars.com/api/?name=Speech&background=111&color=947653'">
+                        </div>
+                    </div>
+                    <h3 class="text-xl md:text-2xl text-cream font-serif font-bold mb-3">Speech Fono</h3>
+                    <div class="flex flex-col items-center gap-1.5 w-full">
+                        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-gray-300 text-xs md:text-sm shadow-inner whitespace-nowrap">
+                            <span class="w-1.5 h-1.5 rounded-full bg-gold animate-pulse flex-shrink-0"></span>
+                            +18 lançamentos
+                        </div>
+                        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-gray-400 text-xs md:text-sm shadow-inner whitespace-nowrap">
+                            <span class="w-1.5 h-1.5 rounded-full bg-gold/50 flex-shrink-0"></span>
+                            Pós-Graduação
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Émille -->
+                <div class="group flex flex-col items-center text-center">
+                    <div class="w-32 h-32 md:w-40 md:h-40 rounded-full bg-[#1c1c1c] border-2 border-gold/20 p-1.5 mb-6 relative overflow-hidden group-hover:border-gold transition-all duration-500 shadow-[0_0_20px_rgba(148,118,83,0.05)] group-hover:shadow-[0_0_30px_rgba(148,118,83,0.2)] group-hover:-translate-y-2">
+                        <div class="w-full h-full rounded-full overflow-hidden bg-gray-900 relative">
+                             <img src="emille.jpg" alt="Émille Dalbem" class="w-full h-full object-cover relative z-10" onerror="this.src='https://ui-avatars.com/api/?name=Emille&background=111&color=947653'">
+                        </div>
+                    </div>
+                    <h3 class="text-xl md:text-2xl text-cream font-serif font-bold mb-3">Émille Dalbem</h3>
+                    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-gray-300 text-xs md:text-sm shadow-inner">
+                        <span class="w-1.5 h-1.5 rounded-full bg-gold animate-pulse"></span>
+                        +10 lançamentos
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- DOBRA 4 | O CONFRONTO -->
+    <section class="py-24 md:py-32 px-6 bg-cream-bg">
+        <div class="container mx-auto max-w-6xl">
+            <h2 class="text-3xl md:text-5xl text-dark-gold mb-16 text-center font-serif leading-tight">
+                O S.O.L. não é um template.<br>
+                <span class="italic font-normal">É um motor vivo.</span>
+            </h2>
+
+            <div class="grid lg:grid-cols-2 gap-8 md:gap-12 relative">
+                
+                <div class="bg-white border border-red-100 rounded-2xl p-8 md:p-10 shadow-sm relative">
+                    <div class="absolute top-0 right-8 transform -translate-y-1/2 bg-red-50 border border-red-100 text-red-600 text-xs font-bold uppercase tracking-widest py-1.5 px-4 rounded-full">O que as agências fazem hoje</div>
+                    
+                    <ul class="space-y-8 mt-6">
+                        <li class="flex items-start gap-4">
+                            <div class="min-w-[28px] mt-0.5 text-red-500">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                            </div>
+                            <div>
+                                <h4 class="text-lg font-bold text-gray-900 mb-1">Prazos adivinhados</h4>
+                                <p class="text-gray-600 leading-relaxed font-light">O gestor cria a tarefa e chuta uma data de entrega, gerando efeito bola de neve em atrasos.</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-4">
+                            <div class="min-w-[28px] mt-0.5 text-red-500">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                            </div>
+                            <div>
+                                <h4 class="text-lg font-bold text-gray-900 mb-1">Especialista no caos</h4>
+                                <p class="text-gray-600 leading-relaxed font-light">O expert entra no ClickUp da agência, não entende nada e acaba aprovando roteiros no WhatsApp.</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-4">
+                            <div class="min-w-[28px] mt-0.5 text-red-500">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                            </div>
+                            <div>
+                                <h4 class="text-lg font-bold text-gray-900 mb-1">Cobrança manual</h4>
+                                <p class="text-gray-600 leading-relaxed font-light">O estrategista precisa perguntar "Fulano, já terminou a copy?" para o projeto seguir.</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-4">
+                            <div class="min-w-[28px] mt-0.5 text-red-500">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                            </div>
+                            <div>
+                                <h4 class="text-lg font-bold text-gray-900 mb-1">Templates mortos</h4>
+                                <p class="text-gray-600 leading-relaxed font-light">Você precisa apagar, duplicar e reescrever dezenas de tarefas na mão para um novo lançamento.</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="hidden lg:flex absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-white rounded-full border border-gray-200 shadow-sm items-center justify-center z-10 font-serif italic text-xl text-gray-400">
+                    vs
+                </div>
+
+                <div class="bg-dark-gold border border-gold rounded-2xl p-8 md:p-10 shadow-xl relative text-white">
+                    <div class="absolute top-0 right-8 transform -translate-y-1/2 bg-cream border border-gold text-dark-gold text-xs font-bold uppercase tracking-widest py-1.5 px-4 rounded-full shadow-md">O que o S.O.L. faz</div>
+                    
+                    <ul class="space-y-8 mt-6">
+                        <li class="flex items-start gap-4">
+                            <div class="min-w-[28px] mt-0.5 text-gold bg-gold/10 rounded-full p-1">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                            </div>
+                            <div>
+                                <h4 class="text-lg font-bold text-cream mb-1">Cronograma Reverso Inteligente</h4>
+                                <p class="text-gray-300 leading-relaxed font-light">O robô lê a data da captação e calcula os prazos de trás para frente, acionando travas de segurança automáticas.</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-4">
+                            <div class="min-w-[28px] mt-0.5 text-gold bg-gold/10 rounded-full p-1">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                            </div>
+                            <div>
+                                <h4 class="text-lg font-bold text-cream mb-1">Portal Exclusivo do Especialista</h4>
+                                <p class="text-gray-300 leading-relaxed font-light">A automação joga a entrega aprovada em um painel limpo para o Expert dar o "Ok", sem ver o caos da agência.</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-4">
+                            <div class="min-w-[28px] mt-0.5 text-gold bg-gold/10 rounded-full p-1">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                            </div>
+                            <div>
+                                <h4 class="text-lg font-bold text-cream mb-1">Passagem de Bastão Automática</h4>
+                                <p class="text-gray-300 leading-relaxed font-light">A tarefa pula imediatamente para a mesa do Estrategista assim que a arte é concluída. Ninguém espera.</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-4">
+                            <div class="min-w-[28px] mt-0.5 text-gold bg-gold/10 rounded-full p-1">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                            </div>
+                            <div>
+                                <h4 class="text-lg font-bold text-cream mb-1">Blueprint Gerado por IA</h4>
+                                <p class="text-gray-300 leading-relaxed font-light">O expert preenche o briefing e o sistema já gera o documento mestre estruturado no Google Docs.</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- DOBRA 5 | DESTRUIDOR DE OBJEÇÕES -->
+    <section class="py-24 md:py-32 px-6 bg-white border-y border-gray-100">
+        <div class="container mx-auto max-w-4xl">
+            <div class="text-center mb-16">
+                <span class="text-gold font-bold uppercase tracking-widest text-xs mb-4 block">A Realidade do Campo de Batalha</span>
+                <h2 class="text-3xl md:text-5xl text-gray-900 font-serif leading-tight mb-6">
+                    O seu lançamento no <span class="italic text-dark-gold">controle absoluto.</span>
+                </h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
+                    Você já comprou ferramentas antes e elas viraram um cemitério de tarefas atrasadas. O S.O.L. foi desenhado para quem precisa de paz de espírito e previsibilidade.
+                </p>
+            </div>
+
+            <div class="space-y-6">
+                <div class="bg-gray-50 border border-gray-200 p-8 rounded-xl flex flex-col md:flex-row gap-6 items-start hover:shadow-md transition-shadow">
+                    <div class="bg-white p-3 rounded-full shadow-sm border border-gray-100 flex-shrink-0 text-dark-gold">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    </div>
+                    <div>
+                        <h4 class="text-xl font-bold text-gray-900 mb-3 font-serif">"Meu lançamento é muito específico, um template não serve."</h4>
+                        <p class="text-gray-600 leading-relaxed">Nós também odiamos templates. O S.O.L. é construído <strong>sob medida</strong>. Nós mapeamos o seu funil exato (seja PL, Meteórico ou High Ticket) e criamos a esteira perfeita para a sua realidade.</p>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 border border-gray-200 p-8 rounded-xl flex flex-col md:flex-row gap-6 items-start hover:shadow-md transition-shadow">
+                    <div class="bg-white p-3 rounded-full shadow-sm border border-gray-100 flex-shrink-0 text-dark-gold">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    </div>
+                    <div>
+                        <h4 class="text-xl font-bold text-gray-900 mb-3 font-serif">"Como vou saber se algo atrasar e ameaçar a captação?"</h4>
+                        <p class="text-gray-600 leading-relaxed">Com a <strong>Inteligência Anti-Gargalo</strong>. Se o copywriter atrasar a página, a automação aciona uma trava de segurança e recalcula o prazo do Web Designer automaticamente para proteger o tráfego. Você enxerga a crise antes dela acontecer.</p>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 border border-gray-200 p-8 rounded-xl flex flex-col md:flex-row gap-6 items-start hover:shadow-md transition-shadow">
+                    <div class="bg-white p-3 rounded-full shadow-sm border border-gray-100 flex-shrink-0 text-dark-gold">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    </div>
+                    <div>
+                        <h4 class="text-xl font-bold text-gray-900 mb-3 font-serif">"E se a minha equipe não conseguir acompanhar?"</h4>
+                        <p class="text-gray-600 leading-relaxed">Nós eliminamos a fricção. O time só precisa apertar "Concluído". A automação faz o resto: move a tarefa, notifica você e muda os prazos. Além disso, fazemos o alinhamento de implantação com a sua equipe no primeiro dia.</p>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 border border-gray-200 p-8 rounded-xl flex flex-col md:flex-row gap-6 items-start hover:shadow-md transition-shadow">
+                    <div class="bg-white p-3 rounded-full shadow-sm border border-gray-100 flex-shrink-0 text-dark-gold">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+                    </div>
+                    <div>
+                        <h4 class="text-xl font-bold text-gray-900 mb-3 font-serif">"Posso ficar tranquilo sem olhar o WhatsApp?"</h4>
+                        <p class="text-gray-600 leading-relaxed">Sim. A regra do jogo muda: se não está no ClickUp, não existe. O seu WhatsApp volta a ser usado para fechar negócios e conversar com parceiros, não para cobrar roteiro atrasado.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- DOBRA 6 | COMO FUNCIONA A ENTREGA -->
+    <section id="como-funciona" class="py-24 md:py-32 px-6 bg-cream-bg">
+        <div class="container mx-auto max-w-5xl">
+            <div class="text-center mb-20">
+                <h2 class="text-3xl md:text-5xl text-dark-gold font-serif mb-4">Do Caos à Clareza em 5 Passos</h2>
+                <p class="text-lg text-gold font-medium uppercase tracking-widest">Entrega em até 10 dias úteis</p>
+            </div>
+
+            <div class="relative wrap overflow-hidden p-4 h-full">
+                <div class="absolute border-opacity-20 border-gold h-full border left-[28px] md:left-1/2 md:-ml-[1px]"></div>
+
+                <div class="mb-10 flex justify-between items-center w-full md:flex-row-reverse group">
+                    <div class="order-1 md:w-5/12 hidden md:block"></div>
+                    <div class="z-20 flex items-center order-1 bg-dark-gold shadow-xl w-14 h-14 rounded-full flex-shrink-0 group-hover:scale-110 transition-transform">
+                        <h1 class="mx-auto font-bold text-lg text-white font-serif">1</h1>
+                    </div>
+                    <div class="order-1 bg-white border border-gray-100 rounded-xl shadow-sm w-full md:w-5/12 px-6 py-6 ml-6 md:ml-0 text-left md:text-right group-hover:-translate-y-1 transition-transform">
+                        <h3 class="font-bold text-gray-900 text-xl mb-2">Reunião de Alinhamento</h3>
+                        <p class="text-gray-600 leading-relaxed font-light">Entendo seu modelo, funil, equipe e gargalos atuais. Aqui traçamos a rota da sua operação ideal.</p>
+                    </div>
+                </div>
+
+                <div class="mb-10 flex justify-between items-center w-full group">
+                    <div class="order-1 md:w-5/12 hidden md:block"></div>
+                    <div class="z-20 flex items-center order-1 bg-dark-gold shadow-xl w-14 h-14 rounded-full flex-shrink-0 group-hover:scale-110 transition-transform">
+                        <h1 class="mx-auto font-bold text-lg text-white font-serif">2</h1>
+                    </div>
+                    <div class="order-1 bg-white border border-gray-100 rounded-xl shadow-sm w-full md:w-5/12 px-6 py-6 ml-6 md:ml-0 text-left group-hover:-translate-y-1 transition-transform">
+                        <h3 class="font-bold text-gray-900 text-xl mb-2">Estruturação no ClickUp</h3>
+                        <p class="text-gray-600 leading-relaxed font-light">Crio fases, tarefas, automações e lógicas operacionais para o seu time executar sem depender de você.</p>
+                    </div>
+                </div>
+
+                <div class="mb-10 flex justify-between items-center w-full md:flex-row-reverse group">
+                    <div class="order-1 md:w-5/12 hidden md:block"></div>
+                    <div class="z-20 flex items-center order-1 bg-dark-gold shadow-xl w-14 h-14 rounded-full flex-shrink-0 group-hover:scale-110 transition-transform">
+                        <h1 class="mx-auto font-bold text-lg text-white font-serif">3</h1>
+                    </div>
+                    <div class="order-1 bg-white border border-gray-100 rounded-xl shadow-sm w-full md:w-5/12 px-6 py-6 ml-6 md:ml-0 text-left md:text-right group-hover:-translate-y-1 transition-transform">
+                        <h3 class="font-bold text-gray-900 text-xl mb-2">Blueprint do Lançamento</h3>
+                        <p class="text-gray-600 leading-relaxed font-light">Geração do documento central que acaba de vez com a pergunta "cadê isso mesmo?" no meio do processo.</p>
+                    </div>
+                </div>
+
+                <div class="mb-10 flex justify-between items-center w-full group">
+                    <div class="order-1 md:w-5/12 hidden md:block"></div>
+                    <div class="z-20 flex items-center order-1 bg-dark-gold shadow-xl w-14 h-14 rounded-full flex-shrink-0 group-hover:scale-110 transition-transform">
+                        <h1 class="mx-auto font-bold text-lg text-white font-serif">4</h1>
+                    </div>
+                    <div class="order-1 bg-white border border-gray-100 rounded-xl shadow-sm w-full md:w-5/12 px-6 py-6 ml-6 md:ml-0 text-left group-hover:-translate-y-1 transition-transform">
+                        <h3 class="font-bold text-gray-900 text-xl mb-2">Alinhamento com a Equipe</h3>
+                        <p class="text-gray-600 leading-relaxed font-light">Apresento o sistema finalizado para o time. Sem dúvidas, sem resistência, sem retrabalho.</p>
+                    </div>
+                </div>
+
+                <div class="flex justify-between items-center w-full md:flex-row-reverse group">
+                    <div class="order-1 md:w-5/12 hidden md:block"></div>
+                    <div class="z-20 flex items-center order-1 bg-gold shadow-xl w-14 h-14 rounded-full flex-shrink-0 group-hover:scale-110 transition-transform ring-4 ring-cream">
+                        <h1 class="mx-auto font-bold text-lg text-white font-serif">5</h1>
+                    </div>
+                    <div class="order-1 bg-dark-gold border border-gold rounded-xl shadow-xl w-full md:w-5/12 px-6 py-6 ml-6 md:ml-0 text-left md:text-right group-hover:-translate-y-1 transition-transform">
+                        <h3 class="font-bold text-cream text-xl mb-2">Rodada de Ajustes</h3>
+                        <p class="text-gray-200 leading-relaxed font-light">Revisão estrutural final para garantir que o motor está rodando redondo antes da captação começar.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-16 text-center">
+                <!-- Botão alterado para abrir o Modal -->
+                <button type="button" onclick="openFormModal()" class="btn-cta w-full md:w-auto shadow-xl uppercase">
+                    Quero automatizar minha operação
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- DOBRA 7 | AUTORIDADE -->
+    <section id="quem-sou" class="py-24 md:py-32 px-6 bg-white overflow-hidden border-y border-gray-100">
+        <div class="container mx-auto max-w-6xl flex flex-col lg:flex-row gap-16 md:gap-20 items-center">
+            
+            <div class="order-1 lg:order-1 relative w-full max-w-[340px] md:max-w-[420px] mx-auto flex-shrink-0">
+                <div class="absolute -inset-6 bg-cream rounded-[2rem] transform -rotate-6 blur-sm opacity-60"></div>
+                <div class="absolute -inset-6 bg-gold/10 rounded-[2rem] transform rotate-3 border border-gold/20"></div>
+                
+                <div class="relative w-full aspect-[3/4] bg-gray-100 rounded-2xl overflow-hidden shadow-2xl z-10">
+                    <img src="livia.jpg" alt="Lívia Lima - Gestora Estratégica" class="w-full h-full object-cover relative z-10">
+                </div>
+
+                <!-- MUDANÇA AQUI: Tamanho do círculo reduzido (w-24 md:w-32) e padding diminuído (p-1) para o selo ficar mais preenchido -->
+                <div class="absolute -bottom-4 -right-4 md:-bottom-6 md:-right-6 w-24 h-24 md:w-32 md:h-32 rounded-full shadow-[0_15px_35px_rgba(0,0,0,0.5)] border-4 border-white z-20 overflow-hidden bg-white flex items-center justify-center">
+                    <img src="clickup_logo.png" alt="Selo ClickUp" class="w-full h-full object-contain p-1" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/ClickUp_logo.svg/1024px-ClickUp_logo.svg.png'">
+                </div>
+            </div>
+
+            <div class="order-2 lg:order-2 text-left flex-1 z-10">
+                <span class="text-gold font-bold uppercase tracking-widest text-xs mb-4 block">Quem está por trás do S.O.L.</span>
+                <h2 class="text-3xl md:text-5xl text-dark-gold mb-8 font-serif leading-tight">
+                    07 Anos de Digital.<br>Prazer, Lívia Lima.
+                </h2>
+                
+                <div class="space-y-6 text-lg md:text-xl text-gray-700 leading-relaxed font-light">
+                    <p>Eu deixei de vender gestão basica para construir <strong>engenharia operacional</strong>.</p>
+                    <p>Já coordenei mais de 100 lançamentos, de produtos de entrada a mentorias High Ticket. Com essa bagagem de múltiplos 7 dígitos, crio os bastidores perfeitos que permitem ao coprodutor voltar a ser estrategista.</p>
+                    <p>Não vendo teoria. Entro na operação, monto o sistema e só saio quando o seu time já executa com perfeição e autonomia total.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- DOBRA 8 | FAIXA PASSANTE DE PALAVRAS -->
+    <div class="marquee-container py-2 md:py-3">
+        <div class="marquee-content">
+            <div class="marquee-item font-serif italic text-cream text-2xl tracking-[0.15em] uppercase">
+                <span>Estratégia</span> <span class="text-gold text-xs">✦</span>
+                <span>Execução</span> <span class="text-gold text-xs">✦</span>
+                <span>Liberdade</span> <span class="text-gold text-xs">✦</span>
+                <span>Escala</span> <span class="text-gold text-xs">✦</span>
+            </div>
+            <div class="marquee-item font-serif italic text-cream text-2xl tracking-[0.15em] uppercase">
+                <span>Estratégia</span> <span class="text-gold text-xs">✦</span>
+                <span>Execução</span> <span class="text-gold text-xs">✦</span>
+                <span>Liberdade</span> <span class="text-gold text-xs">✦</span>
+                <span>Escala</span> <span class="text-gold text-xs">✦</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- DOBRA 9 | PERGUNTAS FREQUENTES (FAQ) -->
+    <section class="py-24 md:py-32 px-6 bg-[#f7f8f9]">
+        <div class="container mx-auto max-w-3xl">
+            <h2 class="text-3xl md:text-5xl text-dark-gold mb-16 text-center font-serif">Perguntas Frequentes</h2>
+            
+            <div class="space-y-4">
+                <details class="bg-white p-6 rounded-xl shadow-sm cursor-pointer group border border-gray-200 hover:border-gold/40 transition-colors">
+                    <summary class="font-bold text-lg text-gray-900 flex justify-between items-center font-serif">
+                        Quanto tempo leva a implementação? Minha operação vai parar?
+                        <span class="text-gold group-open:rotate-180 transition-transform flex-shrink-0 ml-4">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                        </span>
+                    </summary>
+                    <div class="mt-4 pt-4 border-t border-gray-100 text-gray-600 leading-relaxed font-light">
+                        <p>A entrega completa da sua estrutura acontece em até 10 dias úteis. E o mais importante: a sua operação não para por nenhum minuto. Nós construímos todo o "Megazord" nos bastidores. Só viramos a chave e migramos o seu time na reunião de entrega, quando tudo já estiver 100% testado.</p>
+                    </div>
+                </details>
+                
+                <details class="bg-white p-6 rounded-xl shadow-sm cursor-pointer group border border-gray-200 hover:border-gold/40 transition-colors">
+                    <summary class="font-bold text-lg text-gray-900 flex justify-between items-center font-serif">
+                        Vai automatizar todos os meus estilos de lançamento de uma vez?
+                        <span class="text-gold group-open:rotate-180 transition-transform flex-shrink-0 ml-4">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                        </span>
+                    </summary>
+                    <div class="mt-4 pt-4 border-t border-gray-100 text-gray-600 leading-relaxed font-light">
+                        <p>Cada contratação do S.O.L. contempla a engenharia completa para um modelo de funil específico da sua esteira (ex: seu Lançamento Clássico). Como desenhamos sob medida, entregamos o principal primeiro. Você pode contratar a estruturação dos outros formatos em seguida, com condições especiais.</p>
+                    </div>
+                </details>
+
+                <details class="bg-white p-6 rounded-xl shadow-sm cursor-pointer group border border-gray-200 hover:border-gold/40 transition-colors">
+                    <summary class="font-bold text-lg text-gray-900 flex justify-between items-center font-serif">
+                        Necessito contratar mais pessoas para isso rodar?
+                        <span class="text-gold group-open:rotate-180 transition-transform flex-shrink-0 ml-4">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                        </span>
+                    </summary>
+                    <div class="mt-4 pt-4 border-t border-gray-100 text-gray-600 leading-relaxed font-light">
+                        <p>Definitivamente não. O S.O.L. faz o oposto: otimiza o que você já tem. Nós transformamos a sua equipe atual em uma máquina eficiente, para você ganhar escala operacional sem inchar a sua folha de pagamento.</p>
+                    </div>
+                </details>
+
+                <details class="bg-white p-6 rounded-xl shadow-sm cursor-pointer group border border-gray-200 hover:border-gold/40 transition-colors">
+                    <summary class="font-bold text-lg text-gray-900 flex justify-between items-center font-serif">
+                        Preciso ter o ClickUp na versão paga?
+                        <span class="text-gold group-open:rotate-180 transition-transform flex-shrink-0 ml-4">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                        </span>
+                    </summary>
+                    <div class="mt-4 pt-4 border-t border-gray-100 text-gray-600 leading-relaxed font-light">
+                        <p>Não. O plano gratuito do ClickUp já é suficiente para começarmos. Avaliamos a sua operação, mas em 90% dos casos não há custos com licenças no início.</p>
+                    </div>
+                </details>
+
+                <details class="bg-white p-6 rounded-xl shadow-sm cursor-pointer group border border-gray-200 hover:border-gold/40 transition-colors">
+                    <summary class="font-bold text-lg text-gray-900 flex justify-between items-center font-serif">
+                        E se a minha equipe não estiver acostumada a usar o ClickUp?
+                        <span class="text-gold group-open:rotate-180 transition-transform flex-shrink-0 ml-4">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                        </span>
+                    </summary>
+                    <div class="mt-4 pt-4 border-t border-gray-100 text-gray-600 leading-relaxed font-light">
+                        <p>O alinhamento com a equipe faz parte da nossa entrega. Nós não jogamos o sistema no colo deles; fazemos uma reunião mostrando como a vida deles vai ficar mais fácil, organizada e sem retrabalho.</p>
+                    </div>
+                </details>
+
+                <details class="bg-white p-6 rounded-xl shadow-sm cursor-pointer group border border-gray-200 hover:border-gold/40 transition-colors">
+                    <summary class="font-bold text-lg text-gray-900 flex justify-between items-center font-serif">
+                        Quem opera o lançamento depois que vocês entregam?
+                        <span class="text-gold group-open:rotate-180 transition-transform flex-shrink-0 ml-4">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                        </span>
+                    </summary>
+                    <div class="mt-4 pt-4 border-t border-gray-100 text-gray-600 leading-relaxed font-light">
+                        <p>A sua própria equipe. O S.O.L. é a construção do motor. Quando o sistema é entregue e testado por nós, o seu time assume o volante com autonomia total.</p>
+                    </div>
+                </details>
+            </div>
+        </div>
+    </section>
+
+    <!-- DOBRA 10 | CTA FINAL -->
+    <section id="contato" class="py-32 px-6 bg-[#0a0a0a] text-center text-white relative overflow-hidden">
+        <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjEiIGZpbGw9InJnYmEoMjU1LDIyNSwxNjEsMC4wNSkiLz48L3N2Zz4=')] opacity-30"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl h-full bg-gold opacity-10 blur-[150px] rounded-full pointer-events-none"></div>
+
+        <div class="container mx-auto max-w-4xl relative z-10">
+            <h2 class="text-4xl md:text-5xl lg:text-6xl mb-6 leading-tight font-serif text-white">
+                Chega de rodar lançamento <br class="hidden md:block"><span class="italic text-cream drop-shadow-md">no improviso.</span>
+            </h2>
+            <p class="text-xl md:text-2xl leading-relaxed mb-14 text-gray-300 font-light max-w-3xl mx-auto">
+                A estrutura que falta na sua operação tem nome e pode estar pronta em poucos dias. <strong class="text-white font-medium">Sua operação merece um motor.</strong>
+            </p>
+            
+            <div class="space-y-6 flex flex-col items-center">
+                <!-- Botão alterado para abrir o Modal -->
+                <button type="button" onclick="openFormModal()" class="btn-cta text-lg md:text-xl px-10 md:px-16 py-5 w-full sm:w-auto uppercase">
+                    Quero automatizar minha operação
+                </button>
+                <p class="text-cream/80 uppercase tracking-widest text-[10px] md:text-xs font-bold mt-2 flex items-center justify-center gap-2 text-center">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-cream flex-shrink-0"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    AGENDE SEU DIAGNÓSTICO · 30 MINUTOS · SEM COMPROMISSO
+                </p>
+            </div>
+            
+            <div class="mt-28 pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="text-sm text-gray-500">© 2024 Lívia Lima. Todos os direitos reservados.</p>
+                <p class="text-sm text-gray-300">Dúvidas? Me chama no Instagram <a href="https://instagram.com/livia.operacoesestrategicas" target="_blank" class="text-cream hover:text-white transition-colors font-bold underline underline-offset-4 decoration-cream/30">@livia.operacoesestrategicas</a></p>
+            </div>
+        </div>
+    </section> 
+
+    <!-- MODAL DO FORMULÁRIO -->
+    <div id="formModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4 sm:p-6 opacity-0 transition-opacity duration-300">
+        <div class="bg-[#0f0f0f] border border-gold/30 rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto hide-scrollbar shadow-2xl relative transform scale-95 transition-transform duration-300" id="modalContent">
+            
+            <!-- Botão Fechar -->
+            <button type="button" onclick="closeFormModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 p-2 rounded-full transition-colors z-10">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+
+            <!-- Cabeçalho do Modal -->
+            <div class="p-6 md:p-10 border-b border-white/10 text-center">
+                <span class="text-gold font-bold uppercase tracking-widest text-xs mb-2 block">Aplicação para Diagnóstico</span>
+                <h2 class="text-2xl md:text-3xl text-white font-serif mb-4">Escolha o melhor horário para a sua Call</h2>
+                <a href="https://calendar.app.google/Far8yoJe6RPKw6zL9" target="_blank" class="inline-flex items-center justify-center gap-2 bg-white/5 border border-gold/40 text-cream hover:bg-gold/10 hover:text-white transition-colors py-3 px-6 rounded-lg text-sm font-semibold w-full sm:w-auto">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                    Abrir Calendário para Agendar
+                </a>
+            </div>
+
+            <!-- Corpo do Formulário -->
+            <div class="p-6 md:p-10" id="formContainer">
+                <form id="leadForm" class="space-y-6">
+                    
+                    <!-- Horário Agendado -->
+                    <label class="flex items-center gap-3 p-4 bg-white/5 border border-white/10 rounded-lg cursor-pointer hover:border-gold/30 transition-colors">
+                        <input type="checkbox" name="horario_agendado" value="Sim" class="form-radio-checkbox w-5 h-5 rounded">
+                        <span class="text-white font-medium">Já escolhi meu horário e agendei a call ✅ <span class="text-gray-400 text-sm font-normal">(Opcional)</span></span>
+                    </label>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Nome -->
+                        <div>
+                            <label class="form-label">Nome Completo <span class="text-red-500">*</span></label>
+                            <input type="text" name="nome" required class="form-input" placeholder="Seu nome completo">
+                        </div>
+
+                        <!-- Email -->
+                        <div>
+                            <label class="form-label">Endereço de E-mail Principal <span class="text-red-500">*</span></label>
+                            <input type="email" name="email" required class="form-input" placeholder="seu@email.com">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- WhatsApp -->
+                        <div>
+                            <label class="form-label">WhatsApp <span class="text-red-500">*</span></label>
+                            <input type="tel" name="whatsapp" required class="form-input" placeholder="+55 (00) 00000-0000">
+                        </div>
+                        
+                        <!-- Instagram -->
+                        <div>
+                            <label class="form-label">Instagram (Opcional)</label>
+                            <input type="text" name="instagram" class="form-input" placeholder="@seu.perfil">
+                        </div>
+                    </div>
+
+                    <!-- Função -->
+                    <div>
+                        <label class="form-label mb-3">Qual é a sua função hoje? <span class="text-red-500">*</span></label>
+                        <div class="space-y-2">
+                            <label class="flex items-center gap-3"><input type="radio" name="funcao" value="Coprodutor(a)" required class="form-radio-checkbox rounded-full" onclick="toggleOutro(false)"><span class="text-gray-300">Coprodutor(a)</span></label>
+                            <label class="flex items-center gap-3"><input type="radio" name="funcao" value="Infoprodutor(a)" required class="form-radio-checkbox rounded-full" onclick="toggleOutro(false)"><span class="text-gray-300">Infoprodutor(a)</span></label>
+                            <label class="flex items-center gap-3"><input type="radio" name="funcao" value="Estrategista de lançamentos" required class="form-radio-checkbox rounded-full" onclick="toggleOutro(false)"><span class="text-gray-300">Estrategista de lançamentos</span></label>
+                            <label class="flex items-center gap-3"><input type="radio" name="funcao" value="Dono(a) de Agência" required class="form-radio-checkbox rounded-full" onclick="toggleOutro(false)"><span class="text-gray-300">Dono(a) de Agência (Marketing, Publicidade, etc.)</span></label>
+                            <label class="flex items-center gap-3"><input type="radio" name="funcao" value="Gestor(a) de Projetos" required class="form-radio-checkbox rounded-full" onclick="toggleOutro(false)"><span class="text-gray-300">Gestor(a) de Projetos</span></label>
+                            <label class="flex items-center gap-3"><input type="radio" name="funcao" value="Outro" required class="form-radio-checkbox rounded-full" onclick="toggleOutro(true)"><span class="text-gray-300">Outro:</span></label>
+                        </div>
+                        
+                        <!-- Campo Outro (Oculto por padrão) -->
+                        <div id="campoOutro" class="mt-3 hidden">
+                            <input type="text" name="funcao_outro" id="inputOutro" class="form-input" placeholder="Especifique sua profissão/função">
+                        </div>
+                    </div>
+
+                    <!-- Faturamento -->
+                    <div>
+                        <label class="form-label">Qual é o faturamento médio mensal do seu negócio hoje? <span class="text-red-500">*</span></label>
+                        <select name="faturamento" required class="form-input appearance-none">
+                            <option value="" disabled selected>Selecione uma opção</option>
+                            <option value="Ainda não faturei">Ainda não faturei</option>
+                            <option value="Até R$ 10 mil">Até R$ 10 mil</option>
+                            <option value="R$ 10 mil a R$ 50 mil">R$ 10 mil a R$ 50 mil</option>
+                            <option value="R$ 50 mil a R$ 100 mil">R$ 50 mil a R$ 100 mil</option>
+                            <option value="R$ 100 mil a R$ 500 mil">R$ 100 mil a R$ 500 mil</option>
+                            <option value="Acima de R$ 500 mil">Acima de R$ 500 mil</option>
+                            <option value="Acima de R$1M">Acima de R$1M</option>
+                        </select>
+                    </div>
+
+                    <!-- Operação Atual -->
+                    <div>
+                        <label class="form-label mb-3">Como está a operação do seu lançamento hoje? (Pode marcar mais de um) <span class="text-red-500">*</span></label>
+                        <div class="space-y-3">
+                            <label class="flex items-start gap-3"><input type="checkbox" name="operacao" value="Não tenho nada documentado" class="form-radio-checkbox rounded mt-1"><span class="text-gray-300 text-sm leading-snug">Não tenho nada documentado, cada lançamento começa do zero</span></label>
+                            <label class="flex items-start gap-3"><input type="checkbox" name="operacao" value="Tenho equipe mas fico no meio" class="form-radio-checkbox rounded mt-1"><span class="text-gray-300 text-sm leading-snug">Tenho equipe, mas ainda fico no meio de tudo</span></label>
+                            <label class="flex items-start gap-3"><input type="checkbox" name="operacao" value="Aprovo no WhatsApp" class="form-radio-checkbox rounded mt-1"><span class="text-gray-300 text-sm leading-snug">Aprovo tarefas e decisões pelo WhatsApp fora do horário</span></label>
+                            <label class="flex items-start gap-3"><input type="checkbox" name="operacao" value="Uso ferramenta mas sem estrutura" class="form-radio-checkbox rounded mt-1"><span class="text-gray-300 text-sm leading-snug">Uso alguma ferramenta de gestão, mas sem uma estrutura de verdade</span></label>
+                            <label class="flex items-start gap-3"><input type="checkbox" name="operacao" value="Já tentei organizar mas não pegou" class="form-radio-checkbox rounded mt-1"><span class="text-gray-300 text-sm leading-snug">Já tentei organizar, mas o sistema não pegou com o time</span></label>
+                            <label class="flex items-start gap-3"><input type="checkbox" name="operacao" value="Roda bem, mas busco automatizar" class="form-radio-checkbox rounded mt-1"><span class="text-gray-300 text-sm leading-snug">Roda bem, mas estou buscando automatizar processos</span></label>
+                        </div>
+                    </div>
+
+                    <!-- Botão Submit -->
+                    <div class="pt-4">
+                        <button type="submit" id="submitBtn" class="w-full btn-cta py-4 text-sm tracking-widest relative">
+                            <span id="submitText">Enviar Aplicação</span>
+                            <div id="submitLoader" class="loader absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></div>
+                        </button>
+                        <p class="text-[10px] text-gray-500 text-center mt-4 font-light">Ao enviar, você concorda em receber contato da Lívia Lima Operação Estratégica para dar continuidade ao seu atendimento. Sem spam, sem enrolação.</p>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Tela de Sucesso (Oculta por padrão) -->
+            <div id="successMessage" class="hidden p-10 text-center">
+                <div class="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                </div>
+                <h3 class="text-2xl font-serif text-white mb-2">Aplicação Recebida!</h3>
+                <p class="text-gray-400 mb-8">Seu formulário foi enviado com sucesso e seu horário na agenda está reservado. Nos vemos na call.</p>
+                <button type="button" onclick="closeFormModal()" class="px-6 py-2 border border-white/20 text-white rounded hover:bg-white/5 transition-colors">Fechar janela</button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- TODOS OS SCRIPTS (CONSOLIDADOS E CORRIGIDOS) -->
+    <script>
+        // --- 1. Funcionalidade do Menu Mobile ---
+        const btn = document.getElementById('mobileMenuBtn');
+        const drawer = document.getElementById('mobileDrawer');
+        const overlay = document.getElementById('mobileOverlay');
+        const iconOpen = document.getElementById('icon-open');
+        const iconClose = document.getElementById('icon-close');
+        const mobileLinks = document.querySelectorAll('.mobile-link');
+
+        function toggleMenu() {
+            drawer.classList.toggle('mobile-drawer-open');
+            overlay.classList.toggle('overlay-open');
+            iconOpen.classList.toggle('hidden');
+            iconClose.classList.toggle('hidden');
+        }
+
+        if(btn && overlay) {
+            btn.addEventListener('click', toggleMenu);
+            overlay.addEventListener('click', toggleMenu);
+        }
+        
+        mobileLinks.forEach(link => {
+            link.addEventListener('click', toggleMenu);
+        });
+
+        // --- 2. Setas do Slider (Vídeos) ---
+        window.slideSlider = function(direction) {
+            const slider = document.getElementById('sol-slider');
+            if (slider) {
+                const card = slider.querySelector('.slider-card');
+                if (card) {
+                    const cardWidth = card.offsetWidth;
+                    const gap = 24; // Corresponde ao gap: 1.5rem
+                    
+                    slider.scrollBy({
+                        left: direction * (cardWidth + gap),
+                        behavior: 'smooth'
+                    });
+                }
+            }
+        };
+
+        // --- 3. Funcionalidade Modal de Formulário ---
+        const modal = document.getElementById('formModal');
+        const modalContent = document.getElementById('modalContent');
+        const form = document.getElementById('leadForm');
+        const formContainer = document.getElementById('formContainer');
+        const successMessage = document.getElementById('successMessage');
+        const campoOutro = document.getElementById('campoOutro');
+        const inputOutro = document.getElementById('inputOutro');
+        const submitBtn = document.getElementById('submitBtn');
+        const submitText = document.getElementById('submitText');
+        const submitLoader = document.getElementById('submitLoader');
+
+        function openFormModal() {
+            if(modal) {
+                modal.classList.remove('hidden');
+                setTimeout(() => {
+                    modal.classList.remove('opacity-0');
+                    modalContent.classList.remove('scale-95');
+                }, 10);
+                document.body.style.overflow = 'hidden'; 
+            }
+        }
+
+        function closeFormModal() {
+            if(modal) {
+                modal.classList.add('opacity-0');
+                modalContent.classList.add('scale-95');
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                    document.body.style.overflow = 'auto'; 
+                    setTimeout(resetFormState, 300);
+                }, 300);
+            }
+        }
+
+        function toggleOutro(show) {
+            if(campoOutro && inputOutro) {
+                if (show) {
+                    campoOutro.classList.remove('hidden');
+                    inputOutro.setAttribute('required', 'required');
+                } else {
+                    campoOutro.classList.add('hidden');
+                    inputOutro.removeAttribute('required');
+                    inputOutro.value = '';
+                }
+            }
+        }
+
+        function resetFormState() {
+            if(form) form.reset();
+            if(formContainer) formContainer.classList.remove('hidden');
+            if(successMessage) successMessage.classList.add('hidden');
+            toggleOutro(false);
+        }
+
+        // --- ATENÇÃO: COLE A URL DO SEU GOOGLE APPS SCRIPT AQUI ABAIXO ---
+        const GOOGLE_SCRIPT_URL = 'COLE_A_SUA_URL_AQUI_ENTRE_AS_ASPAS';
+
+        if(form) {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const checkboxesOperacao = document.querySelectorAll('input[name="operacao"]:checked');
+                if(checkboxesOperacao.length === 0) {
+                    alert('Por favor, selecione pelo menos uma opção em "Como está a operação do seu lançamento hoje?".');
+                    return;
+                }
+
+                submitBtn.disabled = true;
+                submitText.classList.add('opacity-0');
+                submitLoader.style.display = 'block';
+
+                const formData = new FormData(form);
+                
+                const operacoesSelecionadas = Array.from(checkboxesOperacao).map(cb => cb.value).join(', ');
+                formData.set('operacao', operacoesSelecionadas);
+
+                if(GOOGLE_SCRIPT_URL === 'COLE_A_SUA_URL_AQUI_ENTRE_AS_ASPAS') {
+                    alert('O Formulário está pronto no layout, mas você precisa configurar o Google Apps Script e colar a URL no código HTML para ele funcionar de verdade.');
+                    submitBtn.disabled = false;
+                    submitText.classList.remove('opacity-0');
+                    submitLoader.style.display = 'none';
+                    return;
+                }
+
+                fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    formContainer.classList.add('hidden');
+                    successMessage.classList.remove('hidden');
+                })
+                .catch(error => {
+                    alert('Houve um erro ao enviar. Por favor, tente novamente ou nos chame no Instagram.');
+                    console.error('Erro:', error);
+                })
+                .finally(() => {
+                    submitBtn.disabled = false;
+                    submitText.classList.remove('opacity-0');
+                    submitLoader.style.display = 'none';
+                });
+            });
+        }
+    </script>
+</body>
+</html>
